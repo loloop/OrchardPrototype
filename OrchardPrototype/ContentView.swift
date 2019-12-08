@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import UIKit
+import WebKit
 
 struct ContentView: View {
     var body: some View {
@@ -29,22 +31,49 @@ struct ContentView: View {
                 }
             })
 
+            JobsView().tabItem({
+                VStack {
+                    Image(systemName: "doc.text.fill")
+                        .imageScale(.large)
+                        .accentColor(Color.primary)
+                    Text("Vagas")
+                }
+            })
+
+            VideosView().tabItem({
+                VStack {
+                    Image(systemName: "video.fill")
+                        .imageScale(.large)
+                        .accentColor(Color.primary)
+                    Text("Vídeos")
+                }
+            })
+
+            ProfileView().tabItem({
+                VStack {
+                    Image(systemName: "person.fill")
+                        .imageScale(.large)
+                        .accentColor(Color.primary)
+                    Text("Perfil")
+                }
+            })
+
         }
     }
 }
 
 struct NewsView: View {
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading) {
-                Text("Olá, Mauricio")
-                    .asLargeTitle()
-                OrganizerQuickButtons()
-                OrganizerAreaButton()
-                EventReminder()
-                TitleSubtitleView()
-                TalkSpotlightView()
-            }
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    OrganizerQuickButtons()
+                    OrganizerAreaButton()
+                    EventReminder()
+                    TitleSubtitleView()
+                    TalkSpotlightView()
+                }
+            }.navigationBarTitle(Text("Olá, Mauricio"))
         }
     }
 }
@@ -68,6 +97,113 @@ struct EventsView: View {
     }
 }
 
+struct JobsView: View {
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack {
+                    WarningView()
+                    List {
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                        JobOpeningButton()
+                    }.frame(minHeight: 500, maxHeight: .infinity, alignment: .center)
+                }
+            }.frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+            .navigationBarTitle(Text("Vagas"))
+        }
+    }
+}
+
+struct WarningView: View {
+    var body: some View {
+        CardView {
+            VStack {
+                Text("Quer ver a sua vaga aqui?")
+                Text("Cadastre-a em nosso repositório de vagas no GitHub. Veja como aqui")
+            }.padding()
+        }
+    }
+}
+
+struct JobOpeningButton: View {
+    var body: some View {
+        NavigationLink(destination: WebView().navigationBarTitle(Text("Vaga"), displayMode: .inline)) {
+            Text("Vaga").padding()
+        }
+    }
+}
+
+struct WebView: UIViewRepresentable {
+    let url: URL = URL(string: "https://github.com/CocoaHeadsBrasil/vagas/issues/705")!
+
+    func makeUIView(context: Context) -> WKWebView  {
+        return WKWebView()
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        uiView.load(urlRequest(url))
+    }
+
+    func urlRequest(_ url: URL) -> URLRequest {
+        return URLRequest(url: url)
+    }
+}
+
+
+struct VideosView: View {
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack {
+                    TalkSpotlightView()
+                    VideoFilterButton(title: "Favoritos")
+                    VideoFilterButton(title: "Por capítulo")
+                    HStack {
+                        Text("Buscar")
+                        Spacer()
+                        Image(systemName: "magnifyingglass")
+                    }.padding().background(Color.gray.opacity(0.5)).cornerRadius(10).padding()
+                    Text("Recentes").asLargeTitle().frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                    TalkSpotlightView()
+                    TalkSpotlightView()
+                    TalkSpotlightView()
+                    TalkSpotlightView()
+                }
+            }.navigationBarTitle(Text("Videos"))
+        }
+    }
+}
+
+struct VideoFilterButton: View {
+
+    let title: String
+
+    var body: some View {
+        Group {
+            HStack {
+                Text(title).linkStyle()
+                Spacer()
+                Image(systemName: "chevron.right")
+            }.padding(.horizontal)
+            Divider()
+        }
+    }
+}
+
+struct ProfileView: View {
+    var body: some View {
+        Text("perfil mas ainda n tem nada aqui")
+    }
+}
+
 struct CardView<Content>: View where Content: View {
 
     let content: () -> Content
@@ -80,10 +216,9 @@ struct CardView<Content>: View where Content: View {
         Group {
             content()
         }
-        .background(Color(UIColor.tertiarySystemBackground))
+        .background(Color(UIColor.quaternarySystemFill))
         .cornerRadius(8)
-        .padding()
-        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 0)
+        .padding(10)
     }
 }
 
@@ -92,7 +227,8 @@ struct OrganizerQuickButtons: View {
         HStack {
             CardView {
                 VStack {
-                    Image(systemName: "house.fill")
+                    Spacer().frame(height: 10, alignment: .center)
+                    Image(systemName: "calendar.badge.plus")
                         .imageScale(.large)
                     Text("Agenda")
                 }
@@ -101,7 +237,8 @@ struct OrganizerQuickButtons: View {
             }
             CardView {
                 VStack {
-                    Image(systemName: "house.fill")
+                    Spacer().frame(height: 10, alignment: .center)
+                    Image(systemName: "video.badge.plus")
                         .imageScale(.large)
                     Text("Vídeo")
                 }
@@ -131,6 +268,7 @@ struct EventReminder: View {
                 Text("Hoje tem CocoaHeads!")
                     .fontWeight(.medium)
                     .font(.title)
+                    .foregroundColor(Color.primary)
                 Text("Vai ser as 19:00, na PeixeUrbano")
                 Button(action: {}) {
                     Text("Veja como chegar lá")
@@ -173,9 +311,10 @@ struct TitleSubtitleView: View {
                 Text("Obrigado por participar do CocoaHeads SP!")
                     .fontWeight(.medium)
                     .font(.title)
+                    .frame(minHeight: 0, maxHeight: 70, alignment: .center)
                 Text("Fique de olho nas suas notificações! Quem sabe você não ganha alguma coisa? :)")
             }.frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
-            .padding()
+            .padding(10)
         }
     }
 }
@@ -214,12 +353,17 @@ extension Text {
         .background(Color.gray.opacity(0.5))
         .cornerRadius(5)
     }
+
+    func linkStyle() -> some View {
+        self.foregroundColor(.accentColor).font(.system(size: 25))
+    }
 }
 
 struct FilterView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
+                Text("Todos").buttonlike().background(Color.blue)
                 Text("São Paulo").buttonlike()
                 Text("Campinas").buttonlike()
                 Text("Curitiba").buttonlike()
@@ -239,6 +383,9 @@ struct ContentView_Previews: PreviewProvider {
         Group {
             ContentView()
             EventsView()
+            JobsView()
+            VideosView()
+            ProfileView()
         }
     }
 }
